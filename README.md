@@ -3,11 +3,17 @@
  
 # Controls
 
-     chip8              keyBoard
-| 1 | 2 | 3 | C |   | 1 | 2 | 3 | 4 |
-| 4 | 5 | 6 | D |   | Q | W | E | R |
-| 7 | 8 | 9 | E |   | A | S | D | F |
-| A | B | 0 | F |   | Z | X | C | V |
+chip8              
+| 1 | 2 | 3 | C |   
+| 4 | 5 | 6 | D |   
+| 7 | 8 | 9 | E |   
+| A | B | 0 | F |   
+
+keyBoard
+| 1 | 2 | 3 | 4 |
+| Q | W | E | R |
+| A | S | D | F |
+| Z | X | C | V |
 
 # Sceenshots
 
