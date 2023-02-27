@@ -2,7 +2,7 @@
  a work in progress chip 8 emulator in java withou using any external libaries
 
 
-#know bugs
+# know bugs
 
 - font sprites not working properly
 - intruxtion 0xf033 broken
