@@ -17,7 +17,9 @@ public class CHIP8 {
     CPU cpu;
     MEM mem;
 
-    byte keys;
+    public boolean[] keyStatus = new boolean[16];
+    boolean keyEvent;
+    public int keySet;
 
     public CHIP8(Window window){
         this.window = window;
@@ -27,6 +29,12 @@ public class CHIP8 {
 
         state = State.STOPED;
         cpu.run();
+    }
+
+    public void setKey(int address, boolean key){
+        keyEvent = true;
+        keyStatus[address] = key;
+        keySet = address;
     }
 
     public void render(){
@@ -79,7 +87,7 @@ class CPU{
     MEM mem;
     Instructions ins;
 
-    int cpuHz = 60;
+    int cpuHz = 300;
 
     boolean[][] display = new boolean[32][64];
 
@@ -96,7 +104,7 @@ class CPU{
         this.chip8 = chip8;
         this.mem = chip8.mem;
 
-        this.ins = new Instructions(this, mem);
+        this.ins = new Instructions(chip8, this, mem);
 
         stack = new short[16];
         v = new int[16];
@@ -126,11 +134,16 @@ class CPU{
         clrDisplay();
 
     }
-
+    public void block(){
+        //blocks cpu operations
+        pc -= 2;
+    }
+    public void free(){
+        //free cpu operations
+        nextInstruction();
+    }
     //loop
     void run(){
-        mem.write((char) 0x4, (short) 0x1ff);
-        mem.write((char) 0x1, (short) 0x1fe);
         System.out.println("starting loop");
         Thread CPU = new Thread(() -> {
             final long time = 1000/cpuHz;
@@ -169,6 +182,7 @@ class CPU{
         short opcode = (short)((mem.get(pc) << 8) & 0xff00| mem.get((short)(pc+1)) & 0x00ff);
         nextInstruction();
         ins.decode(opcode);
+        chip8.keyEvent = false;
     }
     public void nextInstruction(){
         pc += 2;
@@ -288,9 +302,11 @@ class MEM {
 class Instructions{
     CPU cpu;
     MEM mem;
-    public Instructions(CPU cpu, MEM mem){
-      this.cpu = cpu;
-      this.mem = mem;
+    CHIP8 chip8;
+    public Instructions(CHIP8 chip8, CPU cpu, MEM mem){
+        this.chip8 = chip8;
+        this.cpu = cpu;
+        this.mem = mem;
     }
     public void decode(short opcode){
         switch (opcode & 0xF000) {
@@ -375,9 +391,10 @@ class Instructions{
             case 0xE000:
                 switch (opcode & 0xFF) {
                     case 0x9E:
+                        xE09E(opcode);
                         break;
                     case 0xA1:
-
+                        xE0A1(opcode);
                         break;
                 }
 
@@ -386,6 +403,9 @@ class Instructions{
                 switch (opcode & 0xFF) {
                     case 0x07:
                         xF007(opcode);
+                        break;
+                    case 0x0A:
+                        xF00A(opcode);
                         break;
                     case 0x15:
                         xF015(opcode);
@@ -570,9 +590,30 @@ class Instructions{
             }
         }
     }
+    void xE09E(short opcode){
+        int x = ((opcode & 0x0f00) >> 8);
+        if(cpu.chip8.keyStatus[cpu.v[x]]){
+            cpu.nextInstruction();
+        }
+    }
+    void xE0A1(short opcode){
+        int x = ((opcode & 0x0f00) >> 8);
+        if(!cpu.chip8.keyStatus[cpu.v[x]]){
+            cpu.nextInstruction();
+        }
+    }
     void xF007(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
         cpu.v[x] = cpu.dt;
+    }
+    void xF00A(short opcode){
+        int x = ((opcode & 0x0f00) >> 8);
+        cpu.block();
+        if(chip8.keyEvent) {
+            System.out.println("event");
+            cpu.v[x] = chip8.keySet & 0xf;
+            cpu.free();
+        }
     }
     void xF015(short opcode){
         int x =  ((opcode & 0x0f00) >> 8);

@@ -5,12 +5,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Window extends Canvas {
+public class Window extends Canvas implements KeyListener {
     private JFrame frame;
     private CHIP8 chip8;
     private static int scaleFactor;
@@ -148,7 +150,13 @@ public class Window extends Canvas {
         BufferGraphics = Buffer.getGraphics();
         frame.setVisible(true);
 
+        this.addKeyListener(this);
+        this.setFocusable(true);
+        this.requestFocus();
+
         chip8 = new CHIP8(this);
+
+
     }
    public void updateTitle(){
         if(loadedFileName != null){
@@ -189,6 +197,80 @@ public class Window extends Canvas {
         Graphics g = getGraphics();
         g.drawImage(Buffer, 0, 0, 64 * scaleFactor, 33* scaleFactor, null);
         g.dispose();
+    }
+
+    public void updateKeyStatus(KeyEvent e) {
+        boolean[] keyStatus = chip8.keyStatus;
+        int keyCode = e.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.VK_1:
+                chip8.setKey(0x1, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_2:
+                chip8.setKey(0x2, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_3:
+                chip8.setKey(0x3, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_4:
+                chip8.setKey(0xc, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_Q:
+                chip8.setKey(0x4, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_W:
+                chip8.setKey(0x5, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_E:
+                chip8.setKey(0x6, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_R:
+                chip8.setKey(0xd, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_A:
+                chip8.setKey(0x7, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_S:
+                chip8.setKey(0x8, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_D:
+                chip8.setKey(0x9, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_F:
+                chip8.setKey(0xE, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_Z:
+                chip8.setKey(0xA, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_X:
+                chip8.setKey(0x0, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_C:
+                chip8.setKey(0xb, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            case KeyEvent.VK_V:
+                chip8.setKey(0xf, e.getID() == KeyEvent.KEY_PRESSED);
+                break;
+            default:
+                // do nothing for other keys
+                break;
+        }
+        chip8.keyStatus = keyStatus;
+    }
+
+    @Override
+    public void keyTyped(KeyEvent keyEvent) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+        updateKeyStatus(keyEvent);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
+        updateKeyStatus(keyEvent);
     }
 
     @FunctionalInterface
