@@ -116,11 +116,19 @@ public class Window extends Canvas {
                 chip8.step();
             }
         });
+        JMenuItem nextInsItem = new JMenuItem("next instruction");
+        nextInsItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chip8.cpu.nextInstruction();
+            }
+        });
         emulationMenu.add(pauseItem);
         emulationMenu.add(playItem);
         emulationMenu.add(stopItem);
         emulationMenu.add(resetItem);
         emulationMenu.add(advanceItem);
+        emulationMenu.add(nextInsItem);
 
         // add the menus to the menu bar
         menuBar.add(fileMenu);

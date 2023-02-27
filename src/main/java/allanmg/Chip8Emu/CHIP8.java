@@ -87,10 +87,10 @@ class CPU{
     short pc;
     short i;
 
-    byte[] v;
-    byte sp;
-    byte dt;
-    byte st;
+    int[] v;
+    int sp;
+    int dt;
+    int st;
 
     CPU(CHIP8 chip8){
         this.chip8 = chip8;
@@ -99,7 +99,7 @@ class CPU{
         this.ins = new Instructions(this, mem);
 
         stack = new short[16];
-        v = new byte[16];
+        v = new int[16];
 
         pc = 0x200;
         sp = 0;
@@ -114,7 +114,7 @@ class CPU{
         chip8.state = State.STOPED;
         mem.clear();
         stack = new short[16];
-        v = new byte[16];
+        v = new int[16];
 
         pc = 0x200;
         sp = 0;
@@ -129,8 +129,8 @@ class CPU{
 
     //loop
     void run(){
-        mem.write((byte) 0x4, (short) 0x1ff);
-        mem.write((byte) 0x1, (short) 0x1fE);
+        mem.write((char) 0x4, (short) 0x1ff);
+        mem.write((char) 0x1, (short) 0x1fe);
         System.out.println("starting loop");
         Thread CPU = new Thread(() -> {
             final long time = 1000/cpuHz;
@@ -206,6 +206,7 @@ class CPU{
     }
     void clrDisplay(){
         display = new boolean[32][64];
+
     }
 }
 class MEM {
@@ -229,18 +230,18 @@ class MEM {
             0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
-    byte[] memory;
+    int[] memory;
 
     MEM(CHIP8 chip8) {
         this.chip8 = chip8;
-        memory = new byte[4096];
+        memory = new int[4096];
         loadSprites();
 
     }
 
     public void loadSprites() {
         for (short i = 0; i < sprites.length; i++) {
-            write((byte) sprites[i], i);
+            write((char) sprites[i], i);
         }
     }
 
@@ -249,7 +250,7 @@ class MEM {
             byte[] romData;
             romData = Files.readAllBytes(path);
             for (short i = 0; i < romData.length; i++) {
-                write(romData[i], (short) (0x200 + i));
+                write(romData[i], (0x200 + i));
             }
 
             System.out.println("============ROM LOADED============\n" +
@@ -261,12 +262,12 @@ class MEM {
         }
     }
 
-    public void write(byte value, short adress) {
-        memory[adress] = value;
+    public void write(int value, int adress) {
+        memory[adress & 0xfff] = value & 0xff;
     }
 
-    public byte get(short addr) {
-        return memory[addr];
+    public int get(int addr) {
+        return memory[addr & 0xfff];
     }
 
     public void clear() {
@@ -376,7 +377,7 @@ class Instructions{
                     case 0x9E:
                         break;
                     case 0xA1:
-                            cpu.nextInstruction();
+
                         break;
                 }
 
@@ -432,105 +433,105 @@ class Instructions{
         cpu.jumpTo(nnn);
     }
     void x3000(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte nn = (byte) (opcode & 0x00ff);
+        int x = ((opcode & 0x0f00) >> 8);
+        int nn = (opcode & 0x00ff);
         if (cpu.v[x] == nn) {
             cpu.nextInstruction();
         }
     }
     void x4000(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte nn = (byte) (opcode & 0x00ff);
+        int x =  ((opcode & 0x0f00) >> 8);
+        int nn = (opcode & 0x00ff);
         if (cpu.v[x] != nn) {
             cpu.nextInstruction();
         }
     }
     void x5000(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
         if(cpu.v[x] == cpu.v[y]){
             cpu.nextInstruction();
         }
     }
     void x6000(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte nn = (byte) (opcode & 0x00ff);
+        int x = ((opcode & 0x0f00) >> 8);
+        int nn = (opcode & 0x00ff);
         cpu.v[x] = nn;
     }
     void x7000(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte nn = (byte) (opcode & 0x00ff);
-        cpu.v[x] += nn;
+        int x = ((opcode & 0x0f00) >> 8);
+        int nn = (opcode & 0x00ff);
+        cpu.v[x] = (cpu.v[x] + nn)&0xff;
     }
     void x8000(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
         cpu.v[x] = cpu.v[y];
     }
     void x8001(short opcode){
         cpu.v[0xf] = 0;
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
         cpu.v[x] |= cpu.v[y];
     }
     void x8002(short opcode){
         cpu.v[0xf] = 0;
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
         cpu.v[x] &= cpu.v[y];
     }
     void x8003(short opcode){
         cpu.v[0xf] = 0;
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
         cpu.v[x] ^= cpu.v[y];
     }
     void x8004(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
-        short sum = (short) (cpu.v[x]+cpu.v[y]);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
+        int sum =  (cpu.v[x]+cpu.v[y]);
         cpu.v[0xf] = 0;
         if(sum > 0xff){
             cpu.v[0xf] = 1;
         }
-        cpu.v[x] = (byte)sum;
+        cpu.v[x] = (sum & 0xff);
 
     }
     void x8005(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
-        short sub = (short) (cpu.v[x]-cpu.v[y]);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
+        int sub = (cpu.v[x]-cpu.v[y]);
         cpu.v[0xf] = 0;
-        if(sub < 0){
+        if(sub < 0x0){
             cpu.v[0xf] = 1;
         }
-        cpu.v[x] = (byte)sub;
+        cpu.v[x] = (sub & 0xff);
     }
     void x8006(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x = ((opcode & 0x0f00) >> 8);
 
-        cpu.v[0xf] = (byte) (cpu.v[x] & 0x1);
-        cpu.v[x] >>= 1;
+        cpu.v[0xf] = (cpu.v[x] & 0x01);
+        cpu.v[x] = (cpu.v[x] >> 1) & 0xff;
     }
 
     void x8007(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
         cpu.v[0xf] = 0;
         if(cpu.v[x] < cpu.v[y]){
             cpu.v[0xf] = 1;
         }
-        cpu.v[x] = (byte) (cpu.v[y] - cpu.v[x]);
+        cpu.v[x] = (cpu.v[y] - cpu.v[x]);
     }
     void x800E(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x = ((opcode & 0x0f00) >> 8);
 
-        cpu.v[0xf] = (byte) (cpu.v[x] & 0x80);
-        cpu.v[x] <<= 1;
+        cpu.v[0xf] = (cpu.v[x] & 0x80);
+        cpu.v[x] = (cpu.v[x] << 1) & 0xff;
     }
     void x9000(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte y = (byte) ((opcode & 0x00f0) >> 4);
+        int x = ((opcode & 0x0f00) >> 8);
+        int y = ((opcode & 0x00f0) >> 4);
         if(cpu.v[x] != cpu.v[y]){
             cpu.nextInstruction();
         }
@@ -545,9 +546,9 @@ class Instructions{
     }
     void xC000(short opcode){
         Random random = new Random();
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        byte nn = (byte) (opcode & 0x00ff);
-        cpu.v[x] = (byte) (random.nextInt(255) & nn);
+        int x = ((opcode & 0x0f00) >> 8);
+        int nn = (opcode & 0x00ff);
+        cpu.v[x] = (random.nextInt(255) & nn);
     }
     void xD000(short opcode){
         int x = cpu.v[(opcode & 0x0F00) >> 8];
@@ -570,43 +571,43 @@ class Instructions{
         }
     }
     void xF007(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x = ((opcode & 0x0f00) >> 8);
         cpu.v[x] = cpu.dt;
     }
     void xF015(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x =  ((opcode & 0x0f00) >> 8);
         cpu.dt = cpu.v[x];
     }
     void xF018(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x = ((opcode & 0x0f00) >> 8);
         cpu.st = cpu.v[x];
     }
     void xF01E(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x = ((opcode & 0x0f00) >> 8);
         cpu.i += cpu.v[x];
     }
     void xF029(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x = ((opcode & 0x0f00) >> 8);
         cpu.i += cpu.v[x]*5;
     }
     void xF033(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
-        mem.write((byte) (cpu.v[x] / 100), cpu.i);
-        mem.write((byte) ((cpu.v[x] / 10) % 10), (short) (cpu.i + 1));
-        mem.write((byte) ((cpu.v[x] % 100) % 10), (short) (cpu.i + 2));
+        int x = ((opcode & 0x0f00) >> 8);
+        mem.write((cpu.v[x] / 100), cpu.i);
+        mem.write(((cpu.v[x] / 10) % 10), (cpu.i + 1));
+        mem.write(((cpu.v[x] % 100) % 10), (cpu.i + 2));
 
     }
     void xF055(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x = ((opcode & 0x0f00) >> 8);
         for (int i = 0; i <= x; i++) {
-            mem.write(cpu.v[i], (short) (cpu.i + i));
+            mem.write(cpu.v[i], (cpu.i + i));
         }
         cpu.i += x+1;
     }
     void xF065(short opcode){
-        byte x = (byte) ((opcode & 0x0f00) >> 8);
+        int x = ((opcode & 0x0f00) >> 8);
         for (int i = 0; i <= x; i++) {
-            cpu.v[i] = mem.get((short)(cpu.i + i));
+            cpu.v[i] = mem.get(cpu.i + i);
         }
         cpu.i += x+1;
     }
