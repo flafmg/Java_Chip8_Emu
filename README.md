@@ -5,6 +5,6 @@
 # know bugs
 
 - font sprites not working properly
-- intruxtion 0xf033 broken
+- intruction 0xf033 broken
 - input not working(not implemented)
 - sound not implmented
