@@ -19,9 +19,11 @@ keyBoard
 # Sceenshots
 
 ibm logo: (first milestone)
+
 ![image](https://user-images.githubusercontent.com/100975643/221704420-bc4e0fdc-fe93-4653-8dc5-02aecc5e0567.png)
 
 chip8 test suite, instruction test:
+
 ![image](https://user-images.githubusercontent.com/100975643/221707108-fd8a3ffb-4256-4531-aae3-d1f32aaf0a78.png)
 
 
