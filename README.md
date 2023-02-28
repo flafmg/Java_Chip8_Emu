@@ -44,3 +44,13 @@ chip8 test suite, instruction test:
 - some games dont work as intended (probably some broken instruction in my code) 
 - the emulator doesnt have sound (i didnt implemented)
 
+
+# Special Thanks
+- thanks for everyone in emuDev (reddit.com/emuDev) discord's sever for the help, you guys are awesome <3
+
+
+
+
+
+coding this emulator was a funny experience
+now i want to make a nes emulator  >:)
