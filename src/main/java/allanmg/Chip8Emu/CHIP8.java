@@ -489,22 +489,22 @@ class Instructions{
         cpu.v[x] = cpu.v[y];
     }
     void x8001(short opcode){
-        cpu.v[0xf] = 0;
         int x = ((opcode & 0x0f00) >> 8);
         int y = ((opcode & 0x00f0) >> 4);
         cpu.v[x] |= cpu.v[y];
+        cpu.v[0xf]= 0;
     }
     void x8002(short opcode){
-        cpu.v[0xf] = 0;
         int x = ((opcode & 0x0f00) >> 8);
         int y = ((opcode & 0x00f0) >> 4);
         cpu.v[x] &= cpu.v[y];
+        cpu.v[0xf]= 0;
     }
     void x8003(short opcode){
-        cpu.v[0xf] = 0;
         int x = ((opcode & 0x0f00) >> 8);
         int y = ((opcode & 0x00f0) >> 4);
         cpu.v[x] ^= cpu.v[y];
+        cpu.v[0xf]= 0;
     }
     void x8004(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
@@ -520,34 +520,41 @@ class Instructions{
     void x8005(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
         int y = ((opcode & 0x00f0) >> 4);
-        int sub = (cpu.v[x]-cpu.v[y]);
+        int sub = (cpu.v[x] - cpu.v[y]);
         cpu.v[0xf] = 0;
-        if(sub < 0x0){
+        if(cpu.v[x] > cpu.v[y]){
             cpu.v[0xf] = 1;
         }
         cpu.v[x] = (sub & 0xff);
     }
     void x8006(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
-
-        cpu.v[0xf] = (cpu.v[x] & 0x01);
+        int y = ((opcode & 0x00f0) >> 4);
+        cpu.v[x] = cpu.v[y];
+        int shiftedBit = cpu.v[x] & 0x01;
         cpu.v[x] = (cpu.v[x] >> 1) & 0xff;
+        cpu.v[0xf] = (shiftedBit);
+
     }
 
     void x8007(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
         int y = ((opcode & 0x00f0) >> 4);
+        cpu.v[x] = (cpu.v[y] - cpu.v[x])&0xff;
+
         cpu.v[0xf] = 0;
         if(cpu.v[x] < cpu.v[y]){
             cpu.v[0xf] = 1;
         }
-        cpu.v[x] = (cpu.v[y] - cpu.v[x]);
+
     }
     void x800E(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
-
-        cpu.v[0xf] = (cpu.v[x] & 0x80);
+        int y = ((opcode & 0x00f0) >> 4);
+        cpu.v[x] = cpu.v[y];
+        int shiftedBit = cpu.v[x] >> 7;
         cpu.v[x] = (cpu.v[x] << 1) & 0xff;
+        cpu.v[0xf] = (shiftedBit);
     }
     void x9000(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
