@@ -34,7 +34,7 @@ public class Window extends Canvas implements KeyListener {
         // create the JFrame
         frame = new JFrame("Chip8Emulador - (no roms loaded) - STOPED");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(64 * scaleFactor, 33 * scaleFactor));
+        frame.setPreferredSize(new Dimension(64 * scaleFactor, 34 * scaleFactor));
 
         // create the menu bar
         JMenuBar menuBar = new JMenuBar();
@@ -146,7 +146,7 @@ public class Window extends Canvas implements KeyListener {
         frame.pack();
         frame.setLocationRelativeTo(null);
         // create the back buffer
-        Buffer = new BufferedImage(64, 33, BufferedImage.TYPE_INT_RGB);
+        Buffer = new BufferedImage(64, 34, BufferedImage.TYPE_INT_RGB);
         BufferGraphics = Buffer.getGraphics();
         frame.setVisible(true);
 
@@ -195,7 +195,7 @@ public class Window extends Canvas implements KeyListener {
 
         // rescale the buffer and draw to the canvas
         Graphics g = getGraphics();
-        g.drawImage(Buffer, 0, 0, 64 * scaleFactor, 33* scaleFactor, null);
+        g.drawImage(Buffer, 0, 0, 64 * scaleFactor, 34* scaleFactor, null);
         g.dispose();
     }
 

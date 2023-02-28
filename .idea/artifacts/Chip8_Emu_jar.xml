@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Chip8_Emu:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Chip8_Emu_jar</output-path>
+    <root id="archive" name="Chip8_Emu.jar">
+      <element id="module-output" name="Chip8_Emu" />
+    </root>
+  </artifact>
+</component>

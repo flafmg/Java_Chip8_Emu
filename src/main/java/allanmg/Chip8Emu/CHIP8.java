@@ -87,7 +87,7 @@ class CPU{
     MEM mem;
     Instructions ins;
 
-    int cpuHz = 300;
+    int cpuHz = 500;
 
     boolean[][] display = new boolean[32][64];
 
@@ -584,7 +584,7 @@ class Instructions{
         cpu.v[0xF] = 0;
         for (int yline = 0; yline < height; yline++)
         {
-            int pixel = mem.get((short) (cpu.i + yline));
+            int pixel = mem.get(cpu.i + yline) ;
             for (int xline = 0; xline < 8; xline++)
             {
                 if ((pixel & (0x80 >> xline)) != 0)
@@ -636,7 +636,7 @@ class Instructions{
     }
     void xF029(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
-        cpu.i += cpu.v[x]*5;
+        cpu.i += (cpu.v[x]*5) & 0xfff;
     }
     void xF033(short opcode){
         int x = ((opcode & 0x0f00) >> 8);
