@@ -1,6 +1,7 @@
 # Java_Chip8_Emu
 a very simple chip 8 emulator writen in java, this is my first emulator so its very crappy and broken
-the emulated cicle runs at 256hz(just because its a good number)
+
+the emulated cicle runs at 500hz
 
 it passes the inpotants test (https://github.com/Timendus/chip8-test-suite)
 
